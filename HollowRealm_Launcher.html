@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <title>The Hollow Realm</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+    body {
+      font-family: 'Georgia', serif;
+      background: #050510;
+      color: #e8e0ff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Starfield ── */
+    .stars {
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 30%, rgba(100,60,200,0.2) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(60,100,200,0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(150,60,200,0.1) 0%, transparent 60%),
+        linear-gradient(135deg, #050510 0%, #0a0825 50%, #050510 100%);
+      z-index: 0;
+    }
+
+    .star {
+      position: fixed;
+      border-radius: 50%;
+      background: white;
+      animation: twinkle var(--d) ease-in-out infinite;
+      opacity: 0;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0; }
+      50% { opacity: var(--o); }
+    }
+
+    /* ── Main content ── */
+    .content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px 60px;
+      min-height: 100vh;
+    }
+
+    /* ── Logo section ── */
+    .logo-section {
+      text-align: center;
+      margin-bottom: 48px;
+      animation: fadeDown 0.8s ease forwards;
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .moon-squad {
+      font-size: 0.7rem;
+      letter-spacing: 4px;
+      color: #7b6fa0;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      font-family: Arial, sans-serif;
+    }
+
+    .logo-ring {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      border: 2px solid rgba(138,90,220,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      position: relative;
+      box-shadow:
+        0 0 30px rgba(138,90,220,0.3),
+        0 0 60px rgba(138,90,220,0.1),
+        inset 0 0 30px rgba(138,90,220,0.05);
+      animation: pulse-ring 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse-ring {
+      0%, 100% { box-shadow: 0 0 30px rgba(138,90,220,0.3), 0 0 60px rgba(138,90,220,0.1); }
+      50%       { box-shadow: 0 0 50px rgba(138,90,220,0.5), 0 0 80px rgba(138,90,220,0.2); }
+    }
+
+    .logo-ring::before {
+      content: '';
+      position: absolute;
+      inset: 6px;
+      border-radius: 50%;
+      border: 1px solid rgba(138,90,220,0.25);
+    }
+
+    .logo-icon {
+      font-size: 3.5rem;
+      filter: drop-shadow(0 0 12px rgba(138,90,220,0.8));
+    }
+
+    .title {
+      font-size: 2rem;
+      font-weight: bold;
+      letter-spacing: 3px;
+      color: #fff;
+      line-height: 1.1;
+    }
+
+    .title span {
+      color: #b388ff;
+    }
+
+    .subtitle {
+      font-size: 0.65rem;
+      color: #7b6fa0;
+      letter-spacing: 2px;
+      margin-top: 8px;
+      font-family: Arial, sans-serif;
+      text-transform: uppercase;
+    }
+
+    .live-badge {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 4px 14px;
+      background: linear-gradient(135deg, #8a5adc, #3f51b5);
+      border-radius: 20px;
+      font-size: 0.62rem;
+      font-family: Arial, sans-serif;
+      letter-spacing: 1px;
+      color: #fff;
+      font-weight: bold;
+      box-shadow: 0 0 15px rgba(138,90,220,0.4);
+    }
+
+    /* ── App Cards ── */
+    .apps-grid {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 40px;
+      animation: fadeUp 0.8s ease 0.2s forwards;
+      opacity: 0;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .app-card {
+      background: rgba(20,16,50,0.9);
+      border: 1px solid rgba(138,90,220,0.3);
+      border-radius: 16px;
+      padding: 24px 20px;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+
+    .app-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(138,90,220,0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .app-card:active {
+      transform: scale(0.98);
+      border-color: rgba(138,90,220,0.7);
+      box-shadow: 0 0 30px rgba(138,90,220,0.2);
+    }
+
+    .app-card.gold {
+      border-color: rgba(255,213,79,0.3);
+    }
+
+    .app-card.gold::before {
+      background: linear-gradient(135deg, rgba(255,213,79,0.06) 0%, transparent 60%);
+    }
+
+    .app-card.gold:active {
+      border-color: rgba(255,213,79,0.7);
+      box-shadow: 0 0 30px rgba(255,213,79,0.15);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+
+    .card-icon {
+      font-size: 2.2rem;
+      filter: drop-shadow(0 0 8px rgba(138,90,220,0.6));
+      flex-shrink: 0;
+    }
+
+    .card-icon.gold-icon {
+      filter: drop-shadow(0 0 8px rgba(255,213,79,0.6));
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #fff;
+      letter-spacing: 1px;
+    }
+
+    .card-badge {
+      display: inline-block;
+      margin-top: 4px;
+      padding: 2px 8px;
+      background: rgba(138,90,220,0.2);
+      border: 1px solid rgba(138,90,220,0.4);
+      border-radius: 10px;
+      font-size: 0.58rem;
+      font-family: Arial, sans-serif;
+      color: #b388ff;
+      letter-spacing: 1px;
+    }
+
+    .card-badge.gold-badge {
+      background: rgba(255,213,79,0.15);
+      border-color: rgba(255,213,79,0.3);
+      color: #ffd54f;
+    }
+
+    .card-desc {
+      font-size: 0.72rem;
+      color: #7b6fa0;
+      line-height: 1.6;
+      font-family: Arial, sans-serif;
+      margin-bottom: 14px;
+    }
+
+    .tab-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .pill {
+      padding: 3px 8px;
+      background: rgba(138,90,220,0.1);
+      border: 1px solid rgba(138,90,220,0.2);
+      border-radius: 8px;
+      font-size: 0.58rem;
+      font-family: Arial, sans-serif;
+      color: #9c8cc0;
+    }
+
+    .pill.gold-pill {
+      background: rgba(255,213,79,0.08);
+      border-color: rgba(255,213,79,0.2);
+      color: #c9a83a;
+    }
+
+    .card-arrow {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.2rem;
+      color: rgba(138,90,220,0.4);
+    }
+
+    .card-arrow.gold-arrow { color: rgba(255,213,79,0.3); }
+
+    /* ── How to use section ── */
+    .how-to {
+      width: 100%;
+      max-width: 480px;
+      background: rgba(10,8,30,0.8);
+      border: 1px solid rgba(138,90,220,0.15);
+      border-radius: 12px;
+      padding: 20px;
+      animation: fadeUp 0.8s ease 0.4s forwards;
+      opacity: 0;
+    }
+
+    .how-to h3 {
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 2.5px;
+      color: #8a5adc;
+      margin-bottom: 14px;
+      font-family: Arial, sans-serif;
+    }
+
+    .step {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+      align-items: flex-start;
+    }
+
+    .step-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(138,90,220,0.2);
+      border: 1px solid rgba(138,90,220,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.62rem;
+      color: #b388ff;
+      font-family: Arial, sans-serif;
+      font-weight: bold;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .step-text {
+      font-size: 0.72rem;
+      color: #7b6fa0;
+      line-height: 1.6;
+      font-family: Arial, sans-serif;
+    }
+
+    .step-text strong {
+      color: #b388ff;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 0.6rem;
+      color: #3d3560;
+      font-family: Arial, sans-serif;
+      letter-spacing: 1px;
+      animation: fadeUp 0.8s ease 0.5s forwards;
+      opacity: 0;
+    }
+
+    .footer span { color: #8a5adc; }
+
+    /* ── Modal overlay ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(2,1,15,0.95);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .modal {
+      background: rgba(15,12,40,0.99);
+      border: 1px solid rgba(138,90,220,0.6);
+      border-radius: 16px;
+      padding: 28px 24px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 0 40px rgba(138,90,220,0.2);
+    }
+
+    .modal-icon { font-size: 3rem; margin-bottom: 12px; }
+
+    .modal-title {
+      font-size: 1rem;
+      font-weight: bold;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .modal-desc {
+      font-size: 0.75rem;
+      color: #7b6fa0;
+      line-height: 1.6;
+      font-family: Arial, sans-serif;
+      margin-bottom: 20px;
+    }
+
+    .modal-steps {
+      text-align: left;
+      margin-bottom: 20px;
+    }
+
+    .modal-step {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-size: 0.72rem;
+      color: #9c8cc0;
+      font-family: Arial, sans-serif;
+      line-height: 1.5;
+    }
+
+    .modal-step-num {
+      color: #b388ff;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    .modal-btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #8a5adc, #3f51b5);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.82rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 10px;
+      letter-spacing: 0.5px;
+      box-shadow: 0 0 20px rgba(138,90,220,0.3);
+    }
+
+    .modal-close {
+      background: rgba(30,25,60,0.8);
+      color: #7b6fa0;
+      box-shadow: none;
+    }
+
+    /* Animated rune border */
+    .rune-border {
+      position: absolute;
+      inset: -1px;
+      border-radius: 16px;
+      background: linear-gradient(90deg,
+        rgba(138,90,220,0) 0%,
+        rgba(138,90,220,0.6) 25%,
+        rgba(79,195,247,0.6) 50%,
+        rgba(138,90,220,0.6) 75%,
+        rgba(138,90,220,0) 100%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 3s linear infinite;
+      pointer-events: none;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      padding: 1px;
+    }
+
+    @keyframes shimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Starfield -->
+  <div class="stars" id="stars"></div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-icon" id="modal-icon">⚔️</div>
+      <div class="modal-title" id="modal-title">GM Dashboard</div>
+      <div class="modal-desc" id="modal-desc">Open this app in Claude to run your live session.</div>
+      <div class="modal-steps" id="modal-steps"></div>
+      <button class="modal-btn" id="modal-action" onclick="copyLink()">📋 Copy File Link</button>
+      <button class="modal-btn modal-close" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content">
+
+    <!-- Logo -->
+    <div class="logo-section">
+      <div class="moon-squad">Moon Squad RPG</div>
+      <div class="logo-ring">
+        <div class="logo-icon">🌑</div>
+      </div>
+      <div class="title">THE <span>HOLLOW</span><br>REALM</div>
+      <div class="subtitle">Game Master Suite</div>
+      <div class="live-badge">⚡ GOES LIVE MAY 2, 2026</div>
+    </div>
+
+    <!-- App Cards -->
+    <div class="apps-grid">
+
+      <!-- GM Dashboard -->
+      <div class="app-card" onclick="openModal('gm')">
+        <div class="rune-border"></div>
+        <div class="card-header">
+          <div class="card-icon">⚔️</div>
+          <div>
+            <div class="card-title">GM Dashboard</div>
+            <div class="card-badge">LIVE SESSION TOOL</div>
+          </div>
+        </div>
+        <div class="card-desc">
+          Everything you need to run a live session. Players, dice, raids, home base, session log, map, and more. Use this during your stream.
+        </div>
+        <div class="tab-pills">
+          <span class="pill">👥 Players</span>
+          <span class="pill">🪆 Create</span>
+          <span class="pill">🎲 Dice</span>
+          <span class="pill">⏱ Log</span>
+          <span class="pill">⚔️ Raids</span>
+          <span class="pill">🏠 Base</span>
+          <span class="pill">🌍 Map</span>
+          <span class="pill">🏆 HOF</span>
+          <span class="pill">🛡 Protect</span>
+          <span class="pill">⚔️ Battle</span>
+        </div>
+        <div class="card-arrow">›</div>
+      </div>
+
+      <!-- World Bible -->
+      <div class="app-card gold" onclick="openModal('wb')">
+        <div class="card-header">
+          <div class="card-icon gold-icon">📖</div>
+          <div>
+            <div class="card-title">World Bible</div>
+            <div class="card-badge gold-badge">LORE &amp; REFERENCE</div>
+          </div>
+        </div>
+        <div class="card-desc">
+          Full lore, class bibles, villain bestiary, weapon arsenal, rules, and NPC roster. Use this for prep and reference.
+        </div>
+        <div class="tab-pills">
+          <span class="pill gold-pill">🧙 Classes</span>
+          <span class="pill gold-pill">🗡 Arsenal</span>
+          <span class="pill gold-pill">🎭 Bestiary</span>
+          <span class="pill gold-pill">👁 NPCs</span>
+          <span class="pill gold-pill">🎭 Villains</span>
+          <span class="pill gold-pill">📜 Rules</span>
+          <span class="pill gold-pill">📖 Ref</span>
+        </div>
+        <div class="card-arrow gold-arrow">›</div>
+      </div>
+
+    </div>
+
+    <!-- How to use -->
+    <div class="how-to">
+      <h3>✦ How to Use</h3>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text">Open <strong>claude.ai</strong> on your iPhone and start a new conversation.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text">Tap the <strong>+ attachment button</strong> and upload the .jsx file you want to run.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text">Type: <strong>"Run this as a React artifact"</strong> and send. The app will open.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-text">Bookmark that conversation. Your data persists within the session.</div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <span>✦</span> THE HOLLOW REALM · MOON SQUAD RPG · MAY 2026 <span>✦</span>
+    </div>
+
+  </div>
+
+  <script>
+    // ── Generate starfield ──
+    const starsContainer = document.getElementById('stars');
+    for (let i = 0; i < 80; i++) {
+      const star = document.createElement('div');
+      star.className = 'star';
+      const size = Math.random() * 2.5 + 0.5;
+      star.style.cssText = `
+        width: ${size}px;
+        height: ${size}px;
+        left: ${Math.random() * 100}%;
+        top: ${Math.random() * 100}%;
+        --d: ${2 + Math.random() * 4}s;
+        --o: ${0.3 + Math.random() * 0.7};
+        animation-delay: ${Math.random() * 4}s;
+      `;
+      starsContainer.appendChild(star);
+    }
+
+    // ── Modal data ──
+    const modalData = {
+      gm: {
+        icon: '⚔️',
+        title: 'GM Dashboard',
+        desc: 'Your live session command centre. Open this in Claude during your stream.',
+        file: 'HollowRealm_GMDashboard.jsx',
+        steps: [
+          'Go to claude.ai and start a new chat',
+          'Upload HollowRealm_GMDashboard.jsx',
+          'Type "Run this as a React artifact" and send',
+          'Bookmark that tab — your session lives there',
+        ]
+      },
+      wb: {
+        icon: '📖',
+        title: 'World Bible',
+        desc: 'Full lore, villain bibles, class guides, arsenal, and rules. Use for prep.',
+        file: 'HollowRealm_WorldBible.jsx',
+        steps: [
+          'Go to claude.ai and start a new chat',
+          'Upload HollowRealm_WorldBible.jsx',
+          'Type "Run this as a React artifact" and send',
+          'Bookmark for quick reference between sessions',
+        ]
+      }
+    };
+
+    let currentModal = null;
+
+    function openModal(type) {
+      const data = modalData[type];
+      currentModal = data;
+      document.getElementById('modal-icon').textContent = data.icon;
+      document.getElementById('modal-title').textContent = data.title;
+      document.getElementById('modal-desc').textContent = data.desc;
+
+      const stepsEl = document.getElementById('modal-steps');
+      stepsEl.innerHTML = data.steps.map((s, i) =>
+        `<div class="modal-step"><span class="modal-step-num">${i+1}.</span><span>${s}</span></div>`
+      ).join('');
+
+      document.getElementById('modal-action').textContent = `📋 Copy filename: ${data.file}`;
+      document.getElementById('modal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.remove('active');
+      currentModal = null;
+    }
+
+    function copyLink() {
+      if (!currentModal) return;
+      navigator.clipboard.writeText(currentModal.file).then(() => {
+        const btn = document.getElementById('modal-action');
+        btn.textContent = '✓ Copied!';
+        setTimeout(() => {
+          btn.textContent = `📋 Copy filename: ${currentModal.file}`;
+        }, 2000);
+      }).catch(() => {
+        // Fallback for older iOS
+        const el = document.createElement('textarea');
+        el.value = currentModal.file;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        const btn = document.getElementById('modal-action');
+        btn.textContent = '✓ Copied!';
+        setTimeout(() => {
+          btn.textContent = `📋 Copy filename: ${currentModal.file}`;
+        }, 2000);
+      });
+    }
+
+    // Close modal on overlay click
+    document.getElementById('modal').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+  </script>
+
+</body>
+</html>
